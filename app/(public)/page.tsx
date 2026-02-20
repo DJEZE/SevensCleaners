@@ -176,7 +176,7 @@ export default function HomePage() {
       </section>
 
       {/* ── What's Included ── */}
-      <section className="py-20 px-4 bg-slate-50">
+      <section className="py-20 px-4 bg-brand-50">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
@@ -257,7 +257,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Pricing Teaser ── */}
-      <section className="py-20 px-4 bg-slate-50">
+      <section className="py-20 px-4 bg-brand-50">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
             Simple, Flat-Rate Pricing
@@ -293,21 +293,21 @@ export default function HomePage() {
       </section>
 
       {/* ── Final CTA ── */}
-      <section className="py-20 px-4 bg-white">
+      <section className="py-20 px-4 bg-brand-600">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready for a Fresh Start?
           </h2>
-          <p className="text-slate-500 text-lg mb-8">
+          <p className="text-brand-100 text-lg mb-8">
             Book your first cleaning in minutes. Satisfaction guaranteed or we come back for free.
           </p>
           <Link
             href="/book"
-            className="btn-primary text-lg px-12 py-4 inline-block"
+            className="bg-white text-brand-700 font-bold text-lg px-12 py-4 rounded-lg hover:bg-brand-50 transition-colors inline-block"
           >
             Book a Cleaning
           </Link>
-          <p className="text-xs text-slate-400 mt-4">
+          <p className="text-xs text-brand-200 mt-4">
             No account required to get a quote. Sign up at checkout.
           </p>
         </div>
