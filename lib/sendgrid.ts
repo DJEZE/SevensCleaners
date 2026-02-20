@@ -1,6 +1,6 @@
-import sgMail from "@sendgrid/mail";
+import { Resend } from "resend";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function sendEmail(
   to: string,
@@ -9,19 +9,16 @@ export async function sendEmail(
   text: string
 ): Promise<boolean> {
   try {
-    await sgMail.send({
+    await resend.emails.send({
       to,
-      from: {
-        email: process.env.SENDGRID_FROM_EMAIL!,
-        name: process.env.SENDGRID_FROM_NAME || "Sevens Cleaners",
-      },
+      from: process.env.RESEND_FROM_EMAIL || "Sevens Cleaners <noreply@sevenscleaners.com>",
       subject,
       html,
       text,
     });
     return true;
   } catch (error) {
-    console.error("SendGrid email error:", error);
+    console.error("Resend email error:", error);
     return false;
   }
 }
