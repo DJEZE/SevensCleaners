@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id              String          @id @default(cuid())
+  clerkId         String          @unique
+  role            Role            @default(CUSTOMER)
+  email           String          @unique
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  customerProfile CustomerProfile?
+  cleanerProfile  CleanerProfile?
+}
+
+enum Role {
+  CUSTOMER
+  CLEANER
+  ADMIN
+}
+
+model CustomerProfile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone          String?
+  defaultAddress String?
+  bookings       Booking[]
+}
+
+model CleanerProfile {
+  id              String       @id @default(cuid())
+  userId          String       @unique
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  phone           String
+  email           String
+  serviceArea     String
+  rate            Float        @default(0)
+  availability    Json         @default("{}")
+  suppliesIncluded Boolean     @default(false)
+  idFrontUrl      String?
+  idBackUrl       String?
+  approved        Boolean      @default(false)
+  active          Boolean      @default(true)
+  assignments     Assignment[]
+  createdAt       DateTime     @default(now())
+}
+
+model Booking {
+  id              String           @id @default(cuid())
+  customerId      String
+  customer        CustomerProfile  @relation(fields: [customerId], references: [id])
+  serviceType     ServiceType
+  addOns          Json             @default("[]")
+  price           Float
+  durationMinutes Int
+  address         String
+  scheduleDate    DateTime
+  scheduleWindow  String
+  notes           String?
+  status          BookingStatus    @default(BOOKED)
+  payment         Payment?
+  assignment      Assignment?
+  messageLogs     MessageLog[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+enum ServiceType {
+  ONE_BEDROOM
+  TWO_BEDROOM
+}
+
+enum BookingStatus {
+  BOOKED
+  ASSIGNED
+  IN_ROUTE
+  CLEANING
+  COMPLETED
+  CANCELLED
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  bookingId       String        @unique
+  booking         Booking       @relation(fields: [bookingId], references: [id])
+  squarePaymentId String?       @unique
+  squareOrderId   String?
+  status          PaymentStatus @default(PENDING)
+  amount          Float
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model Assignment {
+  id         String           @id @default(cuid())
+  bookingId  String           @unique
+  booking    Booking          @relation(fields: [bookingId], references: [id])
+  cleanerId  String
+  cleaner    CleanerProfile   @relation(fields: [cleanerId], references: [id])
+  status     AssignmentStatus @default(PENDING)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+}
+
+enum AssignmentStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  IN_ROUTE
+  STARTED
+  FINISHED
+}
+
+model MessageLog {
+  id        String      @id @default(cuid())
+  bookingId String?
+  booking   Booking?    @relation(fields: [bookingId], references: [id])
+  type      MessageType
+  recipient String
+  body      String
+  status    String
+  createdAt DateTime    @default(now())
+}
+
+enum MessageType {
+  SMS
+  EMAIL
+}

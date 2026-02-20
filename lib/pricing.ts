@@ -1,0 +1,32 @@
+export const PRICING = {
+  services: {
+    ONE_BEDROOM: { label: "1 Bedroom", price: 120, durationMinutes: 90 },
+    TWO_BEDROOM: { label: "2 Bedroom", price: 160, durationMinutes: 120 },
+  },
+  addOns: {
+    DEEP_CLEAN:    { label: "Deep Clean",       price: 50, durationMinutes: 45 },
+    INSIDE_OVEN:   { label: "Inside Oven",       price: 25, durationMinutes: 20 },
+    INSIDE_FRIDGE: { label: "Inside Fridge",     price: 25, durationMinutes: 20 },
+    MOVE_IN_OUT:   { label: "Move In / Move Out", price: 75, durationMinutes: 60 },
+    PET_HAIR:      { label: "Pet Hair",          price: 30, durationMinutes: 20 },
+  },
+} as const;
+
+export type ServiceType = keyof typeof PRICING.services;
+export type AddOnType = keyof typeof PRICING.addOns;
+
+export function calculateTotal(
+  serviceType: ServiceType,
+  selectedAddOns: AddOnType[]
+): { price: number; durationMinutes: number } {
+  const service = PRICING.services[serviceType];
+  let price = service.price;
+  let durationMinutes = service.durationMinutes;
+
+  for (const addOn of selectedAddOns) {
+    price += PRICING.addOns[addOn].price;
+    durationMinutes += PRICING.addOns[addOn].durationMinutes;
+  }
+
+  return { price, durationMinutes };
+}
