@@ -21,7 +21,10 @@ export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { redirect: "/sign-in?redirect_url=/book" },
+        { status: 401 }
+      );
     }
 
     const body = await req.json();

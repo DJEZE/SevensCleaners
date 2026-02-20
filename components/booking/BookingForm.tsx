@@ -81,12 +81,18 @@ export default function BookingForm() {
         }),
       });
 
+      const data = await res.json();
+
+      if (res.status === 401 && data.redirect) {
+        window.location.href = data.redirect;
+        return;
+      }
+
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.error || "Failed to create booking");
       }
 
-      const { paymentUrl } = await res.json();
+      const { paymentUrl } = data;
       // Redirect to Square hosted payment page
       window.location.href = paymentUrl;
     } catch (err: unknown) {
