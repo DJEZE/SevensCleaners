@@ -39,11 +39,7 @@ export async function POST(req: NextRequest) {
 
     const paymentRecord = await prisma.payment.findUnique({
       where: { bookingId },
-      include: {
-        booking: {
-          include: { customer: { include: { user: true } } },
-        },
-      },
+      include: { booking: true },
     });
 
     if (!paymentRecord) {
@@ -67,6 +63,9 @@ export async function POST(req: NextRequest) {
     });
 
     const booking = paymentRecord.booking;
+    // Fall back to the email Stripe collected if guestEmail wasn't set
+    const customerEmail = booking.guestEmail ?? session.customer_details?.email ?? undefined;
+
     await sendBookingConfirmation({
       id: booking.id,
       address: booking.address,
@@ -75,8 +74,8 @@ export async function POST(req: NextRequest) {
       price: booking.price,
       serviceType: booking.serviceType,
       addOns: booking.addOns,
-      customerPhone: booking.customer.phone ?? undefined,
-      customerEmail: booking.customer.user.email,
+      customerPhone: booking.guestPhone ?? undefined,
+      customerEmail,
     });
   }
 
