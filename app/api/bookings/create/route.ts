@@ -62,7 +62,8 @@ export async function POST(req: NextRequest) {
     });
 
     // Create Square order + payment link
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+    if (!appUrl) throw new Error("NEXT_PUBLIC_APP_URL environment variable is not set");
     const serviceLabel = data.serviceType === "ONE_BEDROOM" ? "1 Bedroom Cleaning" : "2 Bedroom Cleaning";
 
     const { result } = await squareClient.checkoutApi.createPaymentLink({
