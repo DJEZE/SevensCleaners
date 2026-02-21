@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { PRICING, ServiceType, AddOnType, calculateTotal } from "@/lib/pricing";
-import { loadSquareSdk } from "@/lib/square-client";
 
 interface BookingFormState {
   step: number;
@@ -344,7 +343,7 @@ export default function BookingForm() {
           </div>
 
           <p className="text-xs text-slate-400 text-center">
-            Secure payment powered by Square. Your card information is never stored by us.
+            Secure payment powered by Stripe. Your card information is never stored by us.
           </p>
         </div>
       )}

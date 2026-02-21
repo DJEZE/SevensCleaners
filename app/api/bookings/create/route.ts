@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { getSquareClient, getSquareLocationId } from "@/lib/square";
+import { getStripe } from "@/lib/stripe";
 import { getOrCreateUser } from "@/lib/auth";
-import { ApiError } from "square";
+import Stripe from "stripe";
 import { z } from "zod";
-import { randomUUID } from "crypto";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +38,10 @@ export async function POST(req: NextRequest) {
       profile = await prisma.customerProfile.create({ data: { userId: user.id } });
     }
 
-    // Create booking record in PENDING state
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+    if (!appUrl) throw new Error("NEXT_PUBLIC_APP_URL environment variable is not set");
+
+    // Create booking in PENDING — confirmed to BOOKED only after Stripe webhook fires
     const booking = await prisma.booking.create({
       data: {
         customerId: profile.id,
@@ -51,83 +53,51 @@ export async function POST(req: NextRequest) {
         scheduleDate: new Date(data.scheduleDate + "T12:00:00"),
         scheduleWindow: data.scheduleWindow,
         notes: data.notes ?? "",
-        status: "BOOKED",
+        status: "PENDING",
       },
     });
 
-    // Create payment record
+    const serviceLabel =
+      data.serviceType === "ONE_BEDROOM" ? "1 Bedroom Cleaning" : "2 Bedroom Cleaning";
+
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: { name: serviceLabel },
+          unit_amount: Math.round(data.price * 100),
+        },
+        quantity: 1,
+      },
+    ];
+
+    // Create Stripe Checkout Session
+    const session = await getStripe().checkout.sessions.create({
+      mode: "payment",
+      line_items: lineItems,
+      customer_email: user.email,
+      metadata: { bookingId: booking.id },
+      success_url: `${appUrl}/book/confirmation?bookingId=${booking.id}`,
+      cancel_url: `${appUrl}/book`,
+    });
+
+    if (!session.url) throw new Error("Failed to create Stripe Checkout Session");
+
+    // Persist the session ID so the webhook can look up this booking
     await prisma.payment.create({
       data: {
         bookingId: booking.id,
+        stripeSessionId: session.id,
         amount: data.price,
         status: "PENDING",
       },
     });
 
-    // Create Square order + payment link
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-    if (!appUrl) throw new Error("NEXT_PUBLIC_APP_URL environment variable is not set");
-    const serviceLabel = data.serviceType === "ONE_BEDROOM" ? "1 Bedroom Cleaning" : "2 Bedroom Cleaning";
-
-    const { result } = await getSquareClient().checkoutApi.createPaymentLink({
-      idempotencyKey: randomUUID(),
-      order: {
-        locationId: getSquareLocationId(),
-        referenceId: booking.id,
-        lineItems: [
-          {
-            name: serviceLabel,
-            quantity: "1",
-            basePriceMoney: {
-              amount: BigInt(Math.round(data.price * 100)),
-              currency: "USD",
-            },
-          },
-          ...(data.addOns.map((addOn) => ({
-            name: addOn.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-            quantity: "1",
-            basePriceMoney: {
-              amount: BigInt(0), // Priced into total already
-              currency: "USD",
-            },
-          }))),
-        ],
-      },
-      checkoutOptions: {
-        redirectUrl: `${appUrl}/book/confirmation?bookingId=${booking.id}`,
-        askForShippingAddress: false,
-      },
-      prePopulatedData: {
-        buyerEmail: user.email,
-      },
-    });
-
-    const paymentUrl = result.paymentLink?.url;
-    if (!paymentUrl) {
-      throw new Error("Failed to create Square payment link");
-    }
-
-    // Store Square order ID on payment record
-    if (result.paymentLink?.orderId) {
-      await prisma.payment.update({
-        where: { bookingId: booking.id },
-        data: { squareOrderId: result.paymentLink.orderId },
-      });
-    }
-
-    return NextResponse.json({ bookingId: booking.id, paymentUrl });
+    return NextResponse.json({ bookingId: booking.id, paymentUrl: session.url });
   } catch (error) {
     console.error("Create booking error:", error);
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "Invalid input", details: error.errors }, { status: 400 });
-    }
-    if (error instanceof ApiError) {
-      const details = error.errors?.map((e) => e.detail).filter(Boolean).join("; ");
-      console.error("Square API error:", error.statusCode, error.errors);
-      return NextResponse.json(
-        { error: "Payment provider error", details: details || error.message },
-        { status: 502 }
-      );
     }
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

@@ -65,7 +65,7 @@ model Booking {
   scheduleDate    DateTime
   scheduleWindow  String
   notes           String?
-  status          BookingStatus    @default(BOOKED)
+  status          BookingStatus    @default(PENDING)
   payment         Payment?
   assignment      Assignment?
   messageLogs     MessageLog[]
@@ -79,6 +79,7 @@ enum ServiceType {
 }
 
 enum BookingStatus {
+  PENDING
   BOOKED
   ASSIGNED
   IN_ROUTE
@@ -88,15 +89,15 @@ enum BookingStatus {
 }
 
 model Payment {
-  id              String        @id @default(cuid())
-  bookingId       String        @unique
-  booking         Booking       @relation(fields: [bookingId], references: [id])
-  squarePaymentId String?       @unique
-  squareOrderId   String?
-  status          PaymentStatus @default(PENDING)
-  amount          Float
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id                    String        @id @default(cuid())
+  bookingId             String        @unique
+  booking               Booking       @relation(fields: [bookingId], references: [id])
+  stripeSessionId       String?       @unique
+  stripePaymentIntentId String?       @unique
+  status                PaymentStatus @default(PENDING)
+  amount                Float
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
 }
 
 enum PaymentStatus {
