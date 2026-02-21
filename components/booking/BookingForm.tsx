@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
+import { useState } from "react";
 import { PRICING, ServiceType, AddOnType, calculateTotal } from "@/lib/pricing";
 
 interface BookingFormState {
@@ -13,6 +11,8 @@ interface BookingFormState {
   scheduleDate: string;
   scheduleWindow: string;
   notes: string;
+  email: string;
+  phone: string;
 }
 
 const TIME_WINDOWS = [
@@ -26,8 +26,6 @@ const TIME_WINDOWS = [
 const ADD_ON_KEYS = Object.keys(PRICING.addOns) as AddOnType[];
 
 export default function BookingForm() {
-  const router = useRouter();
-  const { isSignedIn } = useAuth();
   const [state, setState] = useState<BookingFormState>({
     step: 1,
     serviceType: null,
@@ -36,18 +34,9 @@ export default function BookingForm() {
     scheduleDate: "",
     scheduleWindow: "",
     notes: "",
+    email: "",
+    phone: "",
   });
-
-  // Restore any form state saved before the sign-in redirect
-  useEffect(() => {
-    const saved = sessionStorage.getItem("pendingBooking");
-    if (saved) {
-      try {
-        setState(JSON.parse(saved));
-      } catch {}
-      sessionStorage.removeItem("pendingBooking");
-    }
-  }, []);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -69,18 +58,8 @@ export default function BookingForm() {
   }
 
   async function handleCheckout() {
-    if (!state.serviceType || !state.address || !state.scheduleDate || !state.scheduleWindow) {
+    if (!state.serviceType || !state.address || !state.scheduleDate || !state.scheduleWindow || !state.email) {
       setError("Please fill in all required fields.");
-      return;
-    }
-
-    if (!isSignedIn) {
-      // Save form state so it can be restored after the sign-in redirect.
-      // Using the sign-in page (not modal) ensures Clerk fully establishes the
-      // session (__session JWT) before redirecting back, which the middleware
-      // can verify locally without a network handshake.
-      sessionStorage.setItem("pendingBooking", JSON.stringify(state));
-      router.push(`/sign-in?redirect_url=${encodeURIComponent("/book")}`);
       return;
     }
 
@@ -88,7 +67,6 @@ export default function BookingForm() {
     setError("");
 
     try {
-      // Step 1: Create a booking record and get a Square payment link
       const res = await fetch("/api/bookings/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -101,6 +79,8 @@ export default function BookingForm() {
           notes: state.notes,
           price: pricing!.price,
           durationMinutes: pricing!.durationMinutes,
+          email: state.email,
+          phone: state.phone || undefined,
         }),
       });
 
@@ -110,7 +90,6 @@ export default function BookingForm() {
       }
 
       const { paymentUrl } = await res.json();
-      // Redirect to Square hosted payment page
       window.location.href = paymentUrl;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -323,6 +302,32 @@ export default function BookingForm() {
             </div>
           </div>
 
+          <div className="space-y-4">
+            <h3 className="font-semibold text-slate-900">Contact Info</h3>
+            <div>
+              <label className="label">Email *</label>
+              <input
+                type="email"
+                value={state.email}
+                onChange={(e) => setState((p) => ({ ...p, email: e.target.value }))}
+                placeholder="you@example.com"
+                className="input"
+              />
+              <p className="text-xs text-slate-400 mt-1">We&apos;ll send your booking confirmation here.</p>
+            </div>
+            <div>
+              <label className="label">Phone (Optional)</label>
+              <input
+                type="tel"
+                value={state.phone}
+                onChange={(e) => setState((p) => ({ ...p, phone: e.target.value }))}
+                placeholder="(555) 000-0000"
+                className="input"
+              />
+              <p className="text-xs text-slate-400 mt-1">For SMS updates on your cleaner&apos;s arrival.</p>
+            </div>
+          </div>
+
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
               {error}
@@ -335,7 +340,7 @@ export default function BookingForm() {
             </button>
             <button
               onClick={handleCheckout}
-              disabled={loading}
+              disabled={loading || !state.email}
               className="btn-primary flex-1 py-3"
             >
               {loading ? "Processing..." : `Pay $${pricing.price}`}

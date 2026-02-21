@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
-import { getOrCreateUser } from "@/lib/auth";
 import Stripe from "stripe";
 import { z } from "zod";
 
@@ -17,26 +15,14 @@ const schema = z.object({
   notes: z.string().max(1000).optional(),
   price: z.number().positive(),
   durationMinutes: z.number().positive(),
+  email: z.string().email(),
+  phone: z.string().max(20).optional(),
 });
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const body = await req.json();
     const data = schema.parse(body);
-
-    const user = await getOrCreateUser();
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-    // Ensure customer profile exists
-    let profile = user.customerProfile;
-    if (!profile) {
-      profile = await prisma.customerProfile.create({ data: { userId: user.id } });
-    }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL;
     if (!appUrl) throw new Error("NEXT_PUBLIC_APP_URL environment variable is not set");
@@ -44,7 +30,6 @@ export async function POST(req: NextRequest) {
     // Create booking in PENDING — confirmed to BOOKED only after Stripe webhook fires
     const booking = await prisma.booking.create({
       data: {
-        customerId: profile.id,
         serviceType: data.serviceType,
         addOns: data.addOns,
         price: data.price,
@@ -54,6 +39,8 @@ export async function POST(req: NextRequest) {
         scheduleWindow: data.scheduleWindow,
         notes: data.notes ?? "",
         status: "PENDING",
+        guestEmail: data.email,
+        guestPhone: data.phone ?? null,
       },
     });
 
@@ -75,7 +62,7 @@ export async function POST(req: NextRequest) {
     const session = await getStripe().checkout.sessions.create({
       mode: "payment",
       line_items: lineItems,
-      customer_email: user.email,
+      customer_email: data.email,
       metadata: { bookingId: booking.id },
       success_url: `${appUrl}/book/confirmation?bookingId=${booking.id}`,
       cancel_url: `${appUrl}/book`,

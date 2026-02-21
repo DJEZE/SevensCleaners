@@ -55,8 +55,10 @@ model CleanerProfile {
 
 model Booking {
   id              String           @id @default(cuid())
-  customerId      String
-  customer        CustomerProfile  @relation(fields: [customerId], references: [id])
+  customerId      String?
+  customer        CustomerProfile? @relation(fields: [customerId], references: [id])
+  guestEmail      String?
+  guestPhone      String?
   serviceType     ServiceType
   addOns          Json             @default("[]")
   price           Float
