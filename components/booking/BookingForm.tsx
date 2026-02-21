@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth, useClerk } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { PRICING, ServiceType, AddOnType, calculateTotal } from "@/lib/pricing";
 import { loadSquareSdk } from "@/lib/square-client";
 
@@ -29,7 +29,6 @@ const ADD_ON_KEYS = Object.keys(PRICING.addOns) as AddOnType[];
 export default function BookingForm() {
   const router = useRouter();
   const { isSignedIn } = useAuth();
-  const { openSignIn } = useClerk();
   const [state, setState] = useState<BookingFormState>({
     step: 1,
     serviceType: null,
@@ -39,6 +38,18 @@ export default function BookingForm() {
     scheduleWindow: "",
     notes: "",
   });
+
+  // Restore any form state saved before the sign-in redirect
+  useEffect(() => {
+    const saved = sessionStorage.getItem("pendingBooking");
+    if (saved) {
+      try {
+        setState(JSON.parse(saved));
+      } catch {}
+      sessionStorage.removeItem("pendingBooking");
+    }
+  }, []);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -65,7 +76,12 @@ export default function BookingForm() {
     }
 
     if (!isSignedIn) {
-      openSignIn({ forceRedirectUrl: "/book" });
+      // Save form state so it can be restored after the sign-in redirect.
+      // Using the sign-in page (not modal) ensures Clerk fully establishes the
+      // session (__session JWT) before redirecting back, which the middleware
+      // can verify locally without a network handshake.
+      sessionStorage.setItem("pendingBooking", JSON.stringify(state));
+      router.push(`/sign-in?redirect_url=${encodeURIComponent("/book")}`);
       return;
     }
 
