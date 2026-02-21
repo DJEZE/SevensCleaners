@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { getSquareClient, SQUARE_LOCATION_ID } from "@/lib/square";
+import { getSquareClient, getSquareLocationId } from "@/lib/square";
 import { getOrCreateUser } from "@/lib/auth";
+import { ApiError } from "square";
 import { z } from "zod";
 import { randomUUID } from "crypto";
 
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
     const { result } = await getSquareClient().checkoutApi.createPaymentLink({
       idempotencyKey: randomUUID(),
       order: {
-        locationId: SQUARE_LOCATION_ID,
+        locationId: getSquareLocationId(),
         referenceId: booking.id,
         lineItems: [
           {
@@ -119,6 +120,17 @@ export async function POST(req: NextRequest) {
     console.error("Create booking error:", error);
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "Invalid input", details: error.errors }, { status: 400 });
+    }
+    if (error instanceof ApiError) {
+      const details = error.errors?.map((e) => e.detail).filter(Boolean).join("; ");
+      console.error("Square API error:", error.statusCode, error.errors);
+      return NextResponse.json(
+        { error: "Payment provider error", details: details || error.message },
+        { status: 502 }
+      );
+    }
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
     return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });
   }
