@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 // Simple suggestion: return top 3 approved active cleaners not busy on booking date
 export async function GET(req: NextRequest) {
   try {
