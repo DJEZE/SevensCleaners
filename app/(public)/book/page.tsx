@@ -1,14 +1,7 @@
 import { Suspense } from "react";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import BookingForm from "@/components/booking/BookingForm";
 
-export default async function BookPage() {
-  const { userId } = await auth();
-  if (!userId) {
-    redirect("/sign-in?redirect_url=/book");
-  }
-
+export default function BookPage() {
   return (
     <div className="py-12 px-4 bg-slate-50 flex-1">
       <div className="max-w-2xl mx-auto">
