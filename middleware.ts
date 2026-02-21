@@ -17,7 +17,7 @@ const isCleanerRoute = createRouteMatcher(["/cleaner(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
-    await auth().protect();
+    await auth.protect();
   }
   return NextResponse.next();
 });
