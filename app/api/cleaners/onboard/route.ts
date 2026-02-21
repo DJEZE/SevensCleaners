@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { randomUUID } from "crypto";
 
+export const dynamic = "force-dynamic";
+
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
