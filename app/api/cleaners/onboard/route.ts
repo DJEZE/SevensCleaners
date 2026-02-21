@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase";
 import { randomUUID } from "crypto";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
@@ -15,7 +15,7 @@ async function uploadFile(file: File, prefix: string): Promise<string | null> {
   const fileName = `${prefix}-${randomUUID()}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const { data, error } = await supabaseAdmin.storage
+  const { data, error } = await getSupabaseAdmin().storage
     .from("cleaner-ids")
     .upload(fileName, buffer, { contentType: file.type, upsert: false });
 

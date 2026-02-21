@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { squareClient, SQUARE_LOCATION_ID } from "@/lib/square";
+import { getSquareClient, SQUARE_LOCATION_ID } from "@/lib/square";
 import { getOrCreateUser } from "@/lib/auth";
 import { z } from "zod";
 import { randomUUID } from "crypto";
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     if (!appUrl) throw new Error("NEXT_PUBLIC_APP_URL environment variable is not set");
     const serviceLabel = data.serviceType === "ONE_BEDROOM" ? "1 Bedroom Cleaning" : "2 Bedroom Cleaning";
 
-    const { result } = await squareClient.checkoutApi.createPaymentLink({
+    const { result } = await getSquareClient().checkoutApi.createPaymentLink({
       idempotencyKey: randomUUID(),
       order: {
         locationId: SQUARE_LOCATION_ID,
