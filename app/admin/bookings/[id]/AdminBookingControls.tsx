@@ -11,7 +11,7 @@ interface Props {
   cleaners: { id: string; name: string; serviceArea: string }[];
 }
 
-const STATUSES: BookingStatus[] = ["BOOKED", "ASSIGNED", "IN_ROUTE", "CLEANING", "COMPLETED", "CANCELLED"];
+const STATUSES: BookingStatus[] = ["PENDING", "BOOKED", "ASSIGNED", "IN_ROUTE", "CLEANING", "COMPLETED", "CANCELLED"];
 
 export default function AdminBookingControls({ bookingId, currentStatus, currentAssignment, cleaners }: Props) {
   const [status, setStatus] = useState(currentStatus);

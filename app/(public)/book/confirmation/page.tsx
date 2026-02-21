@@ -36,6 +36,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
     );
   }
 
+  const isPending = booking.status === "PENDING";
   const addOns = booking.addOns as string[];
   const dateStr = new Date(booking.scheduleDate).toLocaleDateString("en-US", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
@@ -45,16 +46,34 @@ export default async function ConfirmationPage({ searchParams }: Props) {
     <div className="min-h-screen bg-slate-50 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="card p-8 text-center mb-6">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
-            ✓
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Booking Confirmed!</h1>
-          <p className="text-slate-500">
-            Confirmation sent by SMS and email. Booking ID:{" "}
-            <span className="font-mono font-bold text-slate-900">
-              {booking.id.slice(0, 8).toUpperCase()}
-            </span>
-          </p>
+          {isPending ? (
+            <>
+              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                ⏳
+              </div>
+              <h1 className="text-2xl font-bold text-slate-900 mb-2">Payment Processing</h1>
+              <p className="text-slate-500">
+                Your payment is being confirmed. This page will update once it's verified.
+                Booking ID:{" "}
+                <span className="font-mono font-bold text-slate-900">
+                  {booking.id.slice(0, 8).toUpperCase()}
+                </span>
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                ✓
+              </div>
+              <h1 className="text-2xl font-bold text-slate-900 mb-2">Booking Confirmed!</h1>
+              <p className="text-slate-500">
+                Confirmation sent by SMS and email. Booking ID:{" "}
+                <span className="font-mono font-bold text-slate-900">
+                  {booking.id.slice(0, 8).toUpperCase()}
+                </span>
+              </p>
+            </>
+          )}
         </div>
 
         <div className="card p-6 mb-6">
@@ -83,16 +102,18 @@ export default async function ConfirmationPage({ searchParams }: Props) {
               <dd className="font-medium text-right max-w-[60%]">{booking.address}</dd>
             </div>
             <div className="flex justify-between border-t pt-3">
-              <dt className="font-bold text-slate-900">Total Paid</dt>
+              <dt className="font-bold text-slate-900">Total {isPending ? "Due" : "Paid"}</dt>
               <dd className="font-bold text-brand-600 text-lg">${booking.price}</dd>
             </div>
           </dl>
         </div>
 
-        <div className="card p-6 mb-6">
-          <h2 className="font-bold text-slate-900 mb-6">Booking Status</h2>
-          <StatusTimeline status={booking.status} />
-        </div>
+        {!isPending && (
+          <div className="card p-6 mb-6">
+            <h2 className="font-bold text-slate-900 mb-6">Booking Status</h2>
+            <StatusTimeline status={booking.status} />
+          </div>
+        )}
 
         <div className="text-center space-x-4">
           <Link href="/dashboard" className="btn-primary">View My Bookings</Link>

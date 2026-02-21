@@ -106,10 +106,16 @@ export default async function AdminBookingDetailPage({ params }: Props) {
                 <dt className="text-slate-500">Amount</dt>
                 <dd>${booking.payment.amount}</dd>
               </div>
-              {booking.payment.squarePaymentId && (
+              {booking.payment.stripeSessionId && (
                 <div className="flex justify-between">
-                  <dt className="text-slate-500">Square ID</dt>
-                  <dd className="font-mono text-xs">{booking.payment.squarePaymentId.slice(0, 16)}...</dd>
+                  <dt className="text-slate-500">Session ID</dt>
+                  <dd className="font-mono text-xs">{booking.payment.stripeSessionId.slice(0, 20)}...</dd>
+                </div>
+              )}
+              {booking.payment.stripePaymentIntentId && (
+                <div className="flex justify-between">
+                  <dt className="text-slate-500">Payment Intent</dt>
+                  <dd className="font-mono text-xs">{booking.payment.stripePaymentIntentId.slice(0, 20)}...</dd>
                 </div>
               )}
             </dl>

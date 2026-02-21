@@ -21,7 +21,7 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
     },
   });
 
-  const statuses: (BookingStatus | "ALL")[] = ["ALL", "BOOKED", "ASSIGNED", "IN_ROUTE", "CLEANING", "COMPLETED", "CANCELLED"];
+  const statuses: (BookingStatus | "ALL")[] = ["ALL", "PENDING", "BOOKED", "ASSIGNED", "IN_ROUTE", "CLEANING", "COMPLETED", "CANCELLED"];
 
   return (
     <div>
