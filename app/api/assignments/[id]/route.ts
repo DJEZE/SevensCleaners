@@ -51,13 +51,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         data: { status: bookingStatus },
       });
 
-      // Notify customer
-      await sendStatusUpdate(
-        assignment.booking,
-        bookingStatus,
-        assignment.booking.customer.phone ?? undefined,
-        assignment.booking.customer.user.email
-      );
+      // Notify customer — support both linked accounts and guest bookings
+      const booking = assignment.booking;
+      const customerPhone = booking.customer?.phone ?? booking.guestPhone ?? undefined;
+      const customerEmail = booking.customer?.user.email ?? booking.guestEmail ?? undefined;
+      await sendStatusUpdate(booking, bookingStatus, customerPhone, customerEmail);
     }
 
     return NextResponse.json(updated);
