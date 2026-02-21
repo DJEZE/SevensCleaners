@@ -1,10 +1,17 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-// Server-side client with service role (admin access)
-export const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Server-side client with service role (admin access) — lazily initialized
+let _supabaseAdmin: SupabaseClient | null = null;
+
+export function getSupabaseAdmin(): SupabaseClient {
+  if (!_supabaseAdmin) {
+    _supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+  }
+  return _supabaseAdmin;
+}
 
 // Upload a file to Supabase Storage
 export async function uploadCleanerID(
@@ -12,7 +19,7 @@ export async function uploadCleanerID(
   fileName: string,
   mimeType: string
 ): Promise<string | null> {
-  const { data, error } = await supabaseAdmin.storage
+  const { data, error } = await getSupabaseAdmin().storage
     .from("cleaner-ids")
     .upload(fileName, file, {
       contentType: mimeType,
@@ -25,7 +32,7 @@ export async function uploadCleanerID(
   }
 
   // Return a signed URL valid for 1 hour (admin viewing)
-  const { data: urlData } = await supabaseAdmin.storage
+  const { data: urlData } = await getSupabaseAdmin().storage
     .from("cleaner-ids")
     .createSignedUrl(data.path, 3600);
 
@@ -34,7 +41,7 @@ export async function uploadCleanerID(
 
 // Get a fresh signed URL for an existing file path
 export async function getSignedUrl(filePath: string): Promise<string | null> {
-  const { data } = await supabaseAdmin.storage
+  const { data } = await getSupabaseAdmin().storage
     .from("cleaner-ids")
     .createSignedUrl(filePath, 3600);
   return data?.signedUrl ?? null;
