@@ -6,6 +6,8 @@ import { getOrCreateUser } from "@/lib/auth";
 import { z } from "zod";
 import { randomUUID } from "crypto";
 
+export const dynamic = "force-dynamic";
+
 const schema = z.object({
   serviceType: z.enum(["ONE_BEDROOM", "TWO_BEDROOM"]),
   addOns: z.array(z.string()),

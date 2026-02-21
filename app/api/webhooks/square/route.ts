@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { sendBookingConfirmation } from "@/lib/notifications";
 import crypto from "crypto";
 
+export const dynamic = "force-dynamic";
+
 function verifySquareSignature(body: string, signature: string, signatureKey: string, url: string): boolean {
   const hmac = crypto.createHmac("sha256", signatureKey);
   hmac.update(url + body);

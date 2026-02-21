@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { sendStatusUpdate } from "@/lib/notifications";
 import { AssignmentStatus, BookingStatus } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 // Map assignment status to booking status
 const STATUS_MAP: Partial<Record<AssignmentStatus, BookingStatus>> = {
   IN_ROUTE: "IN_ROUTE",
