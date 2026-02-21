@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth, useClerk } from "@clerk/nextjs";
 import { PRICING, ServiceType, AddOnType, calculateTotal } from "@/lib/pricing";
 import { loadSquareSdk } from "@/lib/square-client";
 
@@ -27,6 +28,8 @@ const ADD_ON_KEYS = Object.keys(PRICING.addOns) as AddOnType[];
 
 export default function BookingForm() {
   const router = useRouter();
+  const { isSignedIn } = useAuth();
+  const { openSignIn } = useClerk();
   const [state, setState] = useState<BookingFormState>({
     step: 1,
     serviceType: null,
@@ -58,6 +61,11 @@ export default function BookingForm() {
   async function handleCheckout() {
     if (!state.serviceType || !state.address || !state.scheduleDate || !state.scheduleWindow) {
       setError("Please fill in all required fields.");
+      return;
+    }
+
+    if (!isSignedIn) {
+      openSignIn({ afterSignInUrl: "/book" });
       return;
     }
 
