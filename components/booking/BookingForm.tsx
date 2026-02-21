@@ -65,7 +65,7 @@ export default function BookingForm() {
     }
 
     if (!isSignedIn) {
-      openSignIn({ afterSignInUrl: "/book" });
+      openSignIn({ forceRedirectUrl: "/book" });
       return;
     }
 
