@@ -23,13 +23,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       data: { status },
     });
 
-    // Send notification
-    await sendStatusUpdate(
-      booking,
-      status,
-      booking.customer.phone ?? undefined,
-      booking.customer.user.email
-    );
+    // Send notification — support both linked accounts and guest bookings
+    const customerPhone = booking.customer?.phone ?? booking.guestPhone ?? undefined;
+    const customerEmail = booking.customer?.user.email ?? booking.guestEmail ?? undefined;
+    await sendStatusUpdate(booking, status, customerPhone, customerEmail);
 
     return NextResponse.json(updated);
   } catch (error) {
