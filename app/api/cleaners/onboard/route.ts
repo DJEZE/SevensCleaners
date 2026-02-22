@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { randomUUID } from "crypto";
@@ -31,9 +30,6 @@ async function uploadFile(file: File, prefix: string): Promise<string | null> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
     const formData = await req.formData();
 
     const name = formData.get("name") as string;
@@ -61,11 +57,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid file type or size. Use JPEG, PNG, WebP, or PDF under 5MB." }, { status: 400 });
     }
 
-    // Upsert user in DB
+    // Upsert user in DB (clerkId repurposed as a stable unique token)
     const user = await prisma.user.upsert({
-      where: { clerkId: userId },
-      update: { email, role: "CLEANER" },
-      create: { clerkId: userId, email, role: "CLEANER" },
+      where: { email },
+      update: { role: "CLEANER" },
+      create: {
+        clerkId: `local-${randomUUID()}`,
+        email,
+        role: "CLEANER",
+      },
     });
 
     // Create cleaner profile

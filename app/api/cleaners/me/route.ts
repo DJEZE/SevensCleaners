@@ -1,25 +1,19 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const { userId } = await auth();
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const cleanerId = cookies().get("cleaner-id")?.value;
+    if (!cleanerId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const user = await prisma.user.findUnique({
-      where: { clerkId: userId },
-      include: { cleanerProfile: true },
-    });
+    const profile = await prisma.cleanerProfile.findUnique({ where: { id: cleanerId } });
+    if (!profile) return NextResponse.json({ error: "No profile" }, { status: 404 });
 
-    if (!user?.cleanerProfile) {
-      return NextResponse.json({ error: "No profile" }, { status: 404 });
-    }
-
-    return NextResponse.json(user.cleanerProfile);
-  } catch (error) {
+    return NextResponse.json(profile);
+  } catch {
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
