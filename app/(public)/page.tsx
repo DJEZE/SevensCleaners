@@ -9,7 +9,7 @@ const steps = [
   {
     number: "02",
     title: "Pay Securely",
-    desc: "Check out with any major card through our Square-powered payment page. No hidden fees, no surprises — you see the total before you pay.",
+    desc: "Check out with any major card through our secure payment page. No hidden fees, no surprises — you see the total before you pay.",
   },
   {
     number: "03",
@@ -28,12 +28,12 @@ const included = [
 ];
 
 const addons = [
+  { label: "Deep Clean", icon: "✨" },
+  { label: "Extra Bedroom", icon: "🛏️" },
   { label: "Inside Oven", icon: "🔥" },
   { label: "Inside Fridge", icon: "🧊" },
-  { label: "Laundry Wash & Fold", icon: "👕" },
-  { label: "Interior Cabinets", icon: "🗄️" },
-  { label: "Garage Sweep", icon: "🏠" },
-  { label: "Window Detail", icon: "🪟" },
+  { label: "Move In / Move Out", icon: "📦" },
+  { label: "Pet Hair", icon: "🐾" },
 ];
 
 const reasons = [
@@ -269,10 +269,8 @@ export default function HomePage() {
             <div className="text-sm font-semibold text-brand-600 uppercase tracking-wide mb-4">Standard Clean</div>
             <div className="space-y-3 text-sm text-slate-700">
               {[
-                ["Studio", "From $89"],
-                ["1 Bedroom", "From $109"],
-                ["2 Bedrooms", "From $139"],
-                ["3+ Bedrooms", "From $169"],
+                ["1 Bedroom", "$120"],
+                ["2 Bedrooms", "$160"],
               ].map(([size, price]) => (
                 <div key={size} className="flex justify-between items-center border-b border-slate-100 pb-2 last:border-0 last:pb-0">
                   <span>{size}</span>
