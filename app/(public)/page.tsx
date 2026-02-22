@@ -31,7 +31,6 @@ const addons = [
   { label: "Deep Clean", icon: "✨" },
   { label: "Extra Bedroom", icon: "🛏️" },
   { label: "Inside Oven", icon: "🔥" },
-  { label: "Inside Fridge", icon: "🧊" },
   { label: "Move In / Move Out", icon: "📦" },
   { label: "Pet Hair", icon: "🐾" },
 ];

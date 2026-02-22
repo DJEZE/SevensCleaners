@@ -7,7 +7,6 @@ export const PRICING = {
     DEEP_CLEAN:       { label: "Deep Clean",        price: 50, durationMinutes: 45 },
     EXTRA_BEDROOM:    { label: "Extra Bedroom",     price: 40, durationMinutes: 30 },
     INSIDE_OVEN:      { label: "Inside Oven",        price: 25, durationMinutes: 20 },
-    INSIDE_FRIDGE:    { label: "Inside Fridge",      price: 25, durationMinutes: 20 },
     MOVE_IN_OUT:      { label: "Move In / Move Out", price: 75, durationMinutes: 60 },
     PET_HAIR:         { label: "Pet Hair",           price: 30, durationMinutes: 20 },
   },

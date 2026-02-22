@@ -5,7 +5,7 @@ const faqs = [
   },
   {
     q: "How much does it cost?",
-    a: "1 bedroom starts at $120 and 2 bedroom starts at $160. Add-ons like deep clean, inside oven/fridge, move-in/out, and pet hair are available at an additional cost. All prices are shown before checkout.",
+    a: "1 bedroom starts at $120 and 2 bedroom starts at $160. Add-ons like deep clean, inside oven, move-in/out, and pet hair are available at an additional cost. All prices are shown before checkout.",
   },
   {
     q: "Are your cleaners vetted?",
