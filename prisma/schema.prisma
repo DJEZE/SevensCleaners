@@ -76,8 +76,10 @@ model Booking {
 }
 
 enum ServiceType {
+  STUDIO
   ONE_BEDROOM
   TWO_BEDROOM
+  THREE_BEDROOM
 }
 
 enum BookingStatus {
