@@ -21,8 +21,8 @@ export default function Header() {
           <Image
             src="/seven-TRASNPARENT.png"
             alt="Sevens Cleaners"
-            width={140}
-            height={48}
+            width={110}
+            height={38}
             priority
           />
         </Link>
