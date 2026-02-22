@@ -50,7 +50,7 @@ export async function sendBookingConfirmation(booking: {
 
   // Email
   if (booking.customerEmail) {
-    const emailSent = await sendEmail(
+    const emailResult = await sendEmail(
       booking.customerEmail,
       "Booking Confirmed - Sevens Cleaners",
       emailHtml,
@@ -62,7 +62,8 @@ export async function sendBookingConfirmation(booking: {
         type: "EMAIL",
         recipient: booking.customerEmail,
         body: emailHtml,
-        status: emailSent ? "sent" : "failed",
+        status: emailResult.success ? "sent" : "failed",
+        externalId: emailResult.emailId,
       },
     });
   }
@@ -94,9 +95,9 @@ export async function sendStatusUpdate(
   }
 
   if (customerEmail) {
-    const sent = await sendEmail(customerEmail, `Booking Update: ${status}`, `<p>${body}</p>`, body);
+    const emailResult = await sendEmail(customerEmail, `Booking Update: ${status}`, `<p>${body}</p>`, body);
     await prisma.messageLog.create({
-      data: { bookingId: booking.id, type: "EMAIL", recipient: customerEmail, body, status: sent ? "sent" : "failed" },
+      data: { bookingId: booking.id, type: "EMAIL", recipient: customerEmail, body, status: emailResult.success ? "sent" : "failed", externalId: emailResult.emailId },
     });
   }
 }

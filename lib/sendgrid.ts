@@ -7,18 +7,18 @@ export async function sendEmail(
   subject: string,
   html: string,
   text: string
-): Promise<boolean> {
+): Promise<{ success: boolean; emailId?: string }> {
   try {
-    await resend.emails.send({
+    const { data } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || "Sevens Cleaners <no-reply@sevenscleaners.com>",
       to,
       subject,
       html,
       text,
     });
-    return true;
+    return { success: true, emailId: data?.id };
   } catch (error) {
     console.error("Resend email error:", error);
-    return false;
+    return { success: false };
   }
 }

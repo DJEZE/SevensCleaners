@@ -132,14 +132,15 @@ enum AssignmentStatus {
 }
 
 model MessageLog {
-  id        String      @id @default(cuid())
-  bookingId String?
-  booking   Booking?    @relation(fields: [bookingId], references: [id])
-  type      MessageType
-  recipient String
-  body      String
-  status    String
-  createdAt DateTime    @default(now())
+  id         String      @id @default(cuid())
+  bookingId  String?
+  booking    Booking?    @relation(fields: [bookingId], references: [id])
+  type       MessageType
+  recipient  String
+  body       String
+  status     String
+  externalId String?
+  createdAt  DateTime    @default(now())
 }
 
 enum MessageType {
