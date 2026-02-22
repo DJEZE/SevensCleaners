@@ -21,8 +21,8 @@ export default function Header() {
           <Image
             src="/logo.png"
             alt="Sevens Cleaners"
-            width={160}
-            height={54}
+            width={120}
+            height={40}
             priority
             className="object-contain"
           />
