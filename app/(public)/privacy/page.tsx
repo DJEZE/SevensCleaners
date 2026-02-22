@@ -6,7 +6,7 @@ export default function PrivacyPage() {
         <p className="text-sm text-slate-400">Last updated: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
         <section>
           <h2 className="text-xl font-bold text-slate-900">Information We Collect</h2>
-          <p>We collect your name, email, phone number, service address, and payment information (processed by Square, never stored by us).</p>
+          <p>We collect your name, email, phone number, service address, and payment information (processed securely, never stored by us).</p>
         </section>
         <section>
           <h2 className="text-xl font-bold text-slate-900">How We Use Your Information</h2>
@@ -15,14 +15,6 @@ export default function PrivacyPage() {
             <li>To send booking confirmations and status updates via SMS and email</li>
             <li>To improve our service</li>
           </ul>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-slate-900">Cleaner ID Documents</h2>
-          <p>Government ID documents uploaded by cleaners are stored securely in encrypted cloud storage. Only authorized administrators can access these documents.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-slate-900">Third-Party Services</h2>
-          <p>We use Clerk (authentication), Square (payments), Twilio (SMS), SendGrid (email), and Supabase (storage). Each has their own privacy policies.</p>
         </section>
         <section>
           <h2 className="text-xl font-bold text-slate-900">Data Retention</h2>
