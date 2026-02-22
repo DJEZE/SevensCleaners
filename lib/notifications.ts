@@ -20,18 +20,25 @@ export async function sendBookingConfirmation(booking: {
 
   const smsBody = `Sevens Cleaners: Booking confirmed! Date: ${dateStr} (${booking.scheduleWindow}). Address: ${booking.address}. Total: $${booking.price}. Booking ID: ${booking.id.slice(0,8).toUpperCase()}`;
 
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://sevenscleaners.com";
+
   const emailHtml = `
-    <h2>Booking Confirmed!</h2>
-    <p>Hi ${booking.customerName || "there"},</p>
-    <p>Your cleaning is scheduled. Here are your details:</p>
-    <table style="border-collapse:collapse;width:100%">
-      <tr><td style="padding:8px;font-weight:bold">Booking ID</td><td style="padding:8px">${booking.id.slice(0,8).toUpperCase()}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Date</td><td style="padding:8px">${dateStr}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Time Window</td><td style="padding:8px">${booking.scheduleWindow}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Address</td><td style="padding:8px">${booking.address}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Total Paid</td><td style="padding:8px">$${booking.price}</td></tr>
-    </table>
-    <p>We'll notify you when a cleaner is assigned. Thank you for choosing Sevens Cleaners!</p>
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px">
+      <div style="text-align:center;margin-bottom:24px">
+        <img src="${siteUrl}/logo.png" alt="Sevens Cleaners" style="height:60px;width:auto" />
+      </div>
+      <h2 style="margin:0 0 8px">Booking Confirmed!</h2>
+      <p>Hi ${booking.customerName || "there"},</p>
+      <p>Your cleaning is scheduled. Here are your details:</p>
+      <table style="border-collapse:collapse;width:100%">
+        <tr><td style="padding:8px;font-weight:bold">Booking ID</td><td style="padding:8px">${booking.id.slice(0,8).toUpperCase()}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold">Date</td><td style="padding:8px">${dateStr}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold">Time Window</td><td style="padding:8px">${booking.scheduleWindow}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold">Address</td><td style="padding:8px">${booking.address}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold">Total Paid</td><td style="padding:8px">$${booking.price}</td></tr>
+      </table>
+      <p>We'll notify you when a cleaner is assigned. Thank you for choosing Sevens Cleaners!</p>
+    </div>
   `;
 
   // SMS
