@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { sendStatusUpdate } from "@/lib/notifications";
 import { AssignmentStatus, BookingStatus } from "@prisma/client";
@@ -15,14 +15,14 @@ const STATUS_MAP: Partial<Record<AssignmentStatus, BookingStatus>> = {
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { userId } = await auth();
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const cookieStore = cookies();
+    const cleanerId = cookieStore.get("cleaner-id")?.value;
+    const adminSession = cookieStore.get("admin-session")?.value;
+    const isAdmin = adminSession === (process.env.ADMIN_PASSWORD ?? "admin");
 
-    const user = await prisma.user.findUnique({
-      where: { clerkId: userId },
-      include: { cleanerProfile: true },
-    });
-    if (!user?.cleanerProfile) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!cleanerId && !isAdmin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const assignment = await prisma.assignment.findUnique({
       where: { id: params.id },
@@ -31,8 +31,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
     if (!assignment) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    // Only the assigned cleaner (or admin) can update
-    if (assignment.cleanerId !== user.cleanerProfile.id && user.role !== "ADMIN") {
+    // Only the assigned cleaner or admin can update
+    if (!isAdmin && assignment.cleanerId !== cleanerId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

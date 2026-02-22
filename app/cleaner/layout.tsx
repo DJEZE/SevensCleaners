@@ -1,17 +1,10 @@
-import { auth } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
 
 export default async function CleanerLayout({ children }: { children: React.ReactNode }) {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
-
-  const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-  if (!user || (user.role !== "CLEANER" && user.role !== "ADMIN")) {
-    redirect("/cleaner/onboarding");
-  }
+  const cleanerId = cookies().get("cleaner-id")?.value;
+  if (!cleanerId) redirect("/cleaner/login");
 
   const navItems = [
     { href: "/cleaner/dashboard", label: "Available Jobs" },
@@ -31,7 +24,11 @@ export default async function CleanerLayout({ children }: { children: React.Reac
               </Link>
             ))}
           </nav>
-          <UserButton afterSignOutUrl="/" />
+          <form action="/api/auth/cleaner-logout" method="POST">
+            <button type="submit" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">
+              Sign Out
+            </button>
+          </form>
         </div>
       </header>
       <main className="max-w-5xl mx-auto px-4 py-8">{children}</main>

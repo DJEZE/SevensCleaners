@@ -1,41 +1,22 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 import { prisma } from "./prisma";
 
-export async function getOrCreateUser() {
-  const { userId } = await auth();
-  if (!userId) return null;
-
-  const clerkUser = await currentUser();
-  if (!clerkUser) return null;
-
-  const email = clerkUser.emailAddresses[0]?.emailAddress ?? "";
-
-  // Upsert user in our DB
-  const user = await prisma.user.upsert({
-    where: { clerkId: userId },
-    update: { email },
-    create: {
-      clerkId: userId,
-      email,
-      role: "CUSTOMER",
-    },
-    include: {
-      customerProfile: true,
-      cleanerProfile: true,
-    },
-  });
-
-  return user;
+export function getAdminSession(): boolean {
+  const session = cookies().get("admin-session")?.value;
+  return session === (process.env.ADMIN_PASSWORD ?? "admin");
 }
 
-export async function requireRole(allowedRoles: string[]) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+export function requireRole(_allowedRoles?: string[]): void {
+  if (!getAdminSession()) throw new Error("Unauthorized");
+}
 
-  const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-  if (!user || !allowedRoles.includes(user.role)) {
-    throw new Error("Forbidden");
-  }
+export async function getCurrentCleaner() {
+  const cleanerId = cookies().get("cleaner-id")?.value;
+  if (!cleanerId) return null;
+  return prisma.cleanerProfile.findUnique({ where: { id: cleanerId } });
+}
 
-  return user;
+// Legacy stub — no customer accounts; returns null
+export async function getOrCreateUser() {
+  return null;
 }

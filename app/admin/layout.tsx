@@ -1,8 +1,6 @@
-import { auth } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
 
 const NAV = [
   { href: "/admin", label: "Dashboard" },
@@ -12,13 +10,9 @@ const NAV = [
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
-
-  const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-  if (!user || user.role !== "ADMIN") {
-    redirect("/");
-  }
+  const session = cookies().get("admin-session")?.value;
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "admin";
+  if (session !== ADMIN_PASSWORD) redirect("/admin/login");
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -40,7 +34,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           ))}
         </nav>
         <div className="px-5 py-4 border-t border-slate-700">
-          <UserButton afterSignOutUrl="/" />
+          <form action="/api/auth/admin-logout" method="POST">
+            <button type="submit" className="text-sm text-slate-400 hover:text-white transition-colors">
+              Sign Out
+            </button>
+          </form>
         </div>
       </aside>
 
