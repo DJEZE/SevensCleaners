@@ -40,6 +40,8 @@ export default function BookingForm() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [addressError, setAddressError] = useState("");
+  const [validatingAddress, setValidatingAddress] = useState(false);
 
   const pricing =
     state.serviceType ? calculateTotal(state.serviceType, state.addOns) : null;
@@ -55,6 +57,25 @@ export default function BookingForm() {
         ? prev.addOns.filter((a) => a !== key)
         : [...prev.addOns, key],
     }));
+  }
+
+  async function handleNextToReview() {
+    setValidatingAddress(true);
+    setAddressError("");
+    try {
+      const res = await fetch(`/api/validate-address?address=${encodeURIComponent(state.address)}`);
+      const data = await res.json();
+      if (!data.valid) {
+        setAddressError(data.error || "Address is outside our service area.");
+        return;
+      }
+      setState((p) => ({ ...p, step: 3 }));
+    } catch {
+      // On failure, allow proceeding
+      setState((p) => ({ ...p, step: 3 }));
+    } finally {
+      setValidatingAddress(false);
+    }
   }
 
   async function handleCheckout() {
@@ -199,11 +220,14 @@ export default function BookingForm() {
             <input
               type="text"
               value={state.address}
-              onChange={(e) => setState((p) => ({ ...p, address: e.target.value }))}
+              onChange={(e) => { setState((p) => ({ ...p, address: e.target.value })); setAddressError(""); }}
               placeholder="Enter your full address"
-              className="input"
+              className={`input ${addressError ? "border-red-400" : ""}`}
               id="address-autocomplete"
             />
+            {addressError && (
+              <p className="text-red-600 text-sm mt-1">{addressError}</p>
+            )}
           </div>
 
           <div>
@@ -252,11 +276,11 @@ export default function BookingForm() {
               Back
             </button>
             <button
-              onClick={() => setState((p) => ({ ...p, step: 3 }))}
-              disabled={!state.address || !state.scheduleDate || !state.scheduleWindow}
+              onClick={handleNextToReview}
+              disabled={!state.address || !state.scheduleDate || !state.scheduleWindow || validatingAddress}
               className="btn-primary flex-1 py-3"
             >
-              Next: Review
+              {validatingAddress ? "Checking address..." : "Next: Review"}
             </button>
           </div>
         </div>
