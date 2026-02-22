@@ -72,13 +72,13 @@ const reasons = [
 const testimonials = [
   {
     name: "Marcus T.",
-    location: "Chicago, IL",
+    location: "Houston, TX",
     rating: 5,
     text: "I booked a deep clean for my apartment before listing it on Airbnb. The cleaners were on time, thorough, and professional. Booked again the very next week.",
   },
   {
     name: "Priya S.",
-    location: "Atlanta, GA",
+    location: "Houston, TX",
     rating: 5,
     text: "The online booking took maybe two minutes. I got a text when they were on the way, and the place looked spotless when I got home. This is exactly what I needed.",
   },
@@ -108,9 +108,12 @@ export default function HomePage() {
       {/* ── Hero ── */}
       <section className="bg-gradient-to-br from-brand-50 via-white to-white py-24 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <span className="inline-block bg-brand-100 text-brand-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-6">
+          <span className="inline-block bg-brand-100 text-brand-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-3">
             Professional Cleaning · On Demand
           </span>
+          <div className="text-brand-600 font-semibold text-sm mb-6 tracking-wide uppercase">
+            Now Serving Greater Houston Area
+          </div>
           <h1 className="text-5xl md:text-6xl font-bold text-slate-900 leading-tight mb-6">
             A Spotless Home,<br />
             <span className="text-brand-600">Booked in Minutes</span>
