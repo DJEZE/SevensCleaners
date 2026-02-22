@@ -116,7 +116,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
         )}
 
         <div className="text-center space-x-4">
-          <Link href="/dashboard" className="btn-primary">View My Bookings</Link>
+          <Link href="/book" className="btn-primary">Book Again</Link>
           <Link href="/" className="btn-secondary">Back to Home</Link>
         </div>
       </div>

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { clsx } from "clsx";
 
 export default function Header() {
@@ -46,29 +45,9 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <SignedOut>
-            <Link
-              href="/sign-in"
-              className="text-sm font-medium text-slate-600 hover:text-slate-900"
-            >
-              Sign In
-            </Link>
-            <Link href="/book" className="btn-primary text-sm">
-              Book Now
-            </Link>
-          </SignedOut>
-          <SignedIn>
-            <Link href="/book" className="btn-primary text-sm">
-              Book Now
-            </Link>
-            <Link
-              href="/dashboard"
-              className="text-sm font-medium text-slate-600 hover:text-slate-900"
-            >
-              My Bookings
-            </Link>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
+          <Link href="/book" className="btn-primary text-sm">
+            Book Now
+          </Link>
         </div>
       </div>
     </header>
