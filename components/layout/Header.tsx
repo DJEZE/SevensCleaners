@@ -16,12 +16,11 @@ export default function Header() {
 
   return (
     <header className="border-b border-slate-200 bg-white sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between bg-black">
+      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/">
           <Image
             src="/seven-TRASNPARENT.png"
             alt="Sevens Cleaners"
-            className="bg-black"
             width={140}
             height={48}
             priority
