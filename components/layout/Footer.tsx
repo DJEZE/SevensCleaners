@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -6,7 +7,15 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-bold text-slate-900 mb-3">Sevens Cleaners</h3>
+            <Link href="/" className="inline-block mb-3">
+              <Image
+                src="/logo.png"
+                alt="Sevens Cleaners"
+                width={130}
+                height={44}
+                className="object-contain"
+              />
+            </Link>
             <p className="text-sm text-slate-500">
               Professional apartment cleaning on demand.
             </p>

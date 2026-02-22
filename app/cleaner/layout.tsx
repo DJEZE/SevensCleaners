@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function CleanerLayout({ children }: { children: React.ReactNode }) {
   const cleanerId = cookies().get("cleaner-id")?.value;
@@ -16,7 +17,9 @@ export default async function CleanerLayout({ children }: { children: React.Reac
     <div className="min-h-screen bg-slate-50">
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/cleaner/dashboard" className="font-bold text-brand-700">Sevens Cleaners</Link>
+          <Link href="/cleaner/dashboard">
+            <Image src="/logo.png" alt="Sevens Cleaners" width={130} height={44} className="object-contain" />
+          </Link>
           <nav className="hidden md:flex items-center gap-4">
             {navItems.map((item) => (
               <Link key={item.href} href={item.href} className="text-sm font-medium text-slate-600 hover:text-slate-900">
