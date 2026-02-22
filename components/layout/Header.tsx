@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { clsx } from "clsx";
@@ -17,8 +18,14 @@ export default function Header() {
   return (
     <header className="border-b border-slate-200 bg-white sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="font-bold text-xl text-brand-700">
-          Sevens Cleaners
+        <Link href="/">
+          <Image
+            src="/seven-TRASNPARENT.png"
+            alt="Sevens Cleaners"
+            width={140}
+            height={48}
+            priority
+          />
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
