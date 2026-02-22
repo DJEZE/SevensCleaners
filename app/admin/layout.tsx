@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 const NAV = [
   { href: "/admin", label: "Dashboard" },
@@ -19,8 +20,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {/* Sidebar */}
       <aside className="w-56 bg-slate-900 flex flex-col fixed inset-y-0">
         <div className="px-5 py-5 border-b border-slate-700">
-          <div className="font-bold text-white">Sevens Cleaners</div>
-          <div className="text-xs text-slate-400 mt-0.5">Admin Portal</div>
+          <Link href="/">
+            <Image src="/logo.png" alt="Sevens Cleaners" width={120} height={40} className="object-contain" />
+          </Link>
+          <div className="text-xs text-slate-400 mt-1">Admin Portal</div>
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1">
           {NAV.map((item) => (

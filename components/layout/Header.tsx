@@ -19,11 +19,12 @@ export default function Header() {
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/">
           <Image
-            src="/seven-TRASNPARENT.png"
+            src="/logo.png"
             alt="Sevens Cleaners"
-            width={140}
-            height={48}
+            width={160}
+            height={54}
             priority
+            className="object-contain"
           />
         </Link>
 
