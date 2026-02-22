@@ -1,13 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminDashboard() {
-  const [totalBookings, completedBookings, pendingBookings, totalCleaners, approvedCleaners, totalRevenue] =
+  const [totalBookings, completedBookings, pendingBookings, totalRevenue] =
     await Promise.all([
       prisma.booking.count(),
       prisma.booking.count({ where: { status: "COMPLETED" } }),
       prisma.booking.count({ where: { status: "BOOKED" } }),
-      prisma.cleanerProfile.count(),
-      prisma.cleanerProfile.count({ where: { approved: true } }),
       prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "COMPLETED" } }),
     ]);
 
@@ -16,8 +14,6 @@ export default async function AdminDashboard() {
     { label: "Completed", value: completedBookings, color: "text-green-600" },
     { label: "Awaiting Assignment", value: pendingBookings, color: "text-yellow-600" },
     { label: "Revenue", value: `$${totalRevenue._sum.amount?.toFixed(2) ?? "0.00"}`, color: "text-brand-600" },
-    { label: "Total Cleaners", value: totalCleaners, color: "text-slate-900" },
-    { label: "Active Cleaners", value: approvedCleaners, color: "text-green-600" },
   ];
 
   // Recent bookings
