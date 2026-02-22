@@ -1,12 +1,8 @@
-import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { format } from "date-fns";
 
 export default async function AdminCleanersPage() {
-  const cleaners = await prisma.cleanerProfile.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { user: true },
-  });
+  const cleaners: never[] = [];
 
   return (
     <div>
