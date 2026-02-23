@@ -67,6 +67,8 @@ model Booking {
   scheduleDate    DateTime
   scheduleWindow  String
   notes           String?
+  promoCode       String?
+  discountAmount  Float            @default(0)
   status          BookingStatus    @default(PENDING)
   payment         Payment?
   assignment      Assignment?
@@ -146,4 +148,21 @@ model MessageLog {
 enum MessageType {
   SMS
   EMAIL
+}
+
+model PromoCode {
+  id            String       @id @default(cuid())
+  code          String       @unique
+  discountType  DiscountType
+  discountValue Float
+  maxUses       Int?
+  usedCount     Int          @default(0)
+  active        Boolean      @default(true)
+  expiresAt     DateTime?
+  createdAt     DateTime     @default(now())
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
 }
