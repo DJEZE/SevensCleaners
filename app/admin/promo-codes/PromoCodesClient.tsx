@@ -88,16 +88,48 @@ export default function PromoCodesClient({ initialCodes }: Props) {
     }
   }
 
+  function handleExportCSV() {
+    const headers = ["Code", "Discount Type", "Discount Value", "Max Uses", "Used Count", "Active", "Expires At", "Created At"];
+    const rows = codes.map((c) => [
+      c.code,
+      c.discountType,
+      c.discountType === "PERCENTAGE" ? `${c.discountValue}%` : `$${c.discountValue}`,
+      c.maxUses ?? "Unlimited",
+      c.usedCount,
+      c.active ? "Yes" : "No",
+      c.expiresAt ? new Date(c.expiresAt).toLocaleDateString("en-US") : "Never",
+      new Date(c.createdAt).toLocaleDateString("en-US"),
+    ]);
+
+    const csv = [headers, ...rows].map((r) => r.map((v) => `"${v}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `promo-codes-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-slate-900">Promo Codes</h1>
-        <button
-          onClick={() => setShowForm((v) => !v)}
-          className="btn-primary px-4 py-2 text-sm"
-        >
-          {showForm ? "Cancel" : "+ New Code"}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleExportCSV}
+            disabled={codes.length === 0}
+            className="btn-secondary px-4 py-2 text-sm"
+          >
+            Export CSV
+          </button>
+          <button
+            onClick={() => setShowForm((v) => !v)}
+            className="btn-primary px-4 py-2 text-sm"
+          >
+            {showForm ? "Cancel" : "+ New Code"}
+          </button>
+        </div>
       </div>
 
       {/* Create form */}
