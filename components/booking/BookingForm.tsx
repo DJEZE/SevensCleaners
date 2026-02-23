@@ -13,6 +13,17 @@ interface BookingFormState {
   notes: string;
   email: string;
   phone: string;
+  promoCode: string;
+}
+
+interface PromoResult {
+  valid: boolean;
+  message?: string;
+  discountType?: "PERCENTAGE" | "FIXED";
+  discountValue?: number;
+  discountAmount?: number;
+  finalPrice?: number;
+  code?: string;
 }
 
 const TIME_WINDOWS = [
@@ -36,15 +47,23 @@ export default function BookingForm() {
     notes: "",
     email: "",
     phone: "",
+    promoCode: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [addressError, setAddressError] = useState("");
   const [validatingAddress, setValidatingAddress] = useState(false);
+  const [promoInput, setPromoInput] = useState("");
+  const [promoResult, setPromoResult] = useState<PromoResult | null>(null);
+  const [promoLoading, setPromoLoading] = useState(false);
 
   const pricing =
     state.serviceType ? calculateTotal(state.serviceType, state.addOns) : null;
+
+  const subtotal = pricing?.price ?? 0;
+  const discountAmount = promoResult?.valid ? (promoResult.discountAmount ?? 0) : 0;
+  const finalPrice = Math.max(0, subtotal - discountAmount);
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -57,6 +76,9 @@ export default function BookingForm() {
         ? prev.addOns.filter((a) => a !== key)
         : [...prev.addOns, key],
     }));
+    // Clear promo when service changes since subtotal changes
+    setPromoResult(null);
+    setPromoInput("");
   }
 
   async function handleNextToReview() {
@@ -76,6 +98,34 @@ export default function BookingForm() {
     } finally {
       setValidatingAddress(false);
     }
+  }
+
+  async function handleApplyPromo() {
+    if (!promoInput.trim() || !pricing) return;
+    setPromoLoading(true);
+    setPromoResult(null);
+    try {
+      const res = await fetch("/api/promo/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoInput.trim(), subtotal }),
+      });
+      const data: PromoResult = await res.json();
+      setPromoResult(data);
+      if (data.valid && data.code) {
+        setState((p) => ({ ...p, promoCode: data.code! }));
+      }
+    } catch {
+      setPromoResult({ valid: false, message: "Could not apply promo code. Please try again." });
+    } finally {
+      setPromoLoading(false);
+    }
+  }
+
+  function handleRemovePromo() {
+    setPromoResult(null);
+    setPromoInput("");
+    setState((p) => ({ ...p, promoCode: "" }));
   }
 
   async function handleCheckout() {
@@ -98,10 +148,11 @@ export default function BookingForm() {
           scheduleDate: state.scheduleDate,
           scheduleWindow: state.scheduleWindow,
           notes: state.notes,
-          price: pricing!.price,
+          price: subtotal,
           durationMinutes: pricing!.durationMinutes,
           email: state.email,
           phone: state.phone || undefined,
+          promoCode: state.promoCode || undefined,
         }),
       });
 
@@ -320,10 +371,72 @@ export default function BookingForm() {
                 <span className="font-medium text-right max-w-[200px]">{state.notes}</span>
               </div>
             )}
-            <div className="border-t border-slate-200 pt-3 flex justify-between">
-              <span className="font-bold text-slate-900">Total</span>
-              <span className="text-xl font-bold text-brand-600">${pricing.price}</span>
+            <div className="border-t border-slate-200 pt-3 space-y-2">
+              {discountAmount > 0 && (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500">Subtotal</span>
+                    <span className="text-slate-500">${subtotal}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Promo ({promoResult?.code})</span>
+                    <span>-${discountAmount.toFixed(2)}</span>
+                  </div>
+                </>
+              )}
+              <div className="flex justify-between">
+                <span className="font-bold text-slate-900">Total</span>
+                <span className="text-xl font-bold text-brand-600">${finalPrice.toFixed(2)}</span>
+              </div>
             </div>
+          </div>
+
+          {/* Promo Code */}
+          <div>
+            <label className="label">Promo Code (Optional)</label>
+            {promoResult?.valid ? (
+              <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <svg className="w-5 h-5 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <div className="flex-1">
+                  <div className="text-sm font-semibold text-green-800">{promoResult.code} applied</div>
+                  <div className="text-xs text-green-700">
+                    {promoResult.discountType === "PERCENTAGE"
+                      ? `${promoResult.discountValue}% off`
+                      : `$${promoResult.discountValue} off`}
+                    {" "}— you save ${discountAmount.toFixed(2)}
+                  </div>
+                </div>
+                <button
+                  onClick={handleRemovePromo}
+                  className="text-xs text-green-700 hover:text-green-900 underline"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={promoInput}
+                  onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoResult(null); }}
+                  placeholder="Enter promo code"
+                  className="input flex-1"
+                  onKeyDown={(e) => e.key === "Enter" && handleApplyPromo()}
+                />
+                <button
+                  onClick={handleApplyPromo}
+                  disabled={!promoInput.trim() || promoLoading}
+                  className="btn-secondary px-4 py-2 whitespace-nowrap"
+                >
+                  {promoLoading ? "Applying..." : "Apply"}
+                </button>
+              </div>
+            )}
+            {promoResult && !promoResult.valid && (
+              <p className="text-red-600 text-sm mt-1">{promoResult.message}</p>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -367,7 +480,7 @@ export default function BookingForm() {
               disabled={loading || !state.email}
               className="btn-primary flex-1 py-3"
             >
-              {loading ? "Processing..." : `Pay $${pricing.price}`}
+              {loading ? "Processing..." : `Pay $${finalPrice.toFixed(2)}`}
             </button>
           </div>
 

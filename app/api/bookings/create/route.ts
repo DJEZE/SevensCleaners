@@ -17,6 +17,7 @@ const schema = z.object({
   durationMinutes: z.number().positive(),
   email: z.string().email(),
   phone: z.string().max(20).optional(),
+  promoCode: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -27,12 +28,38 @@ export async function POST(req: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL;
     if (!appUrl) throw new Error("NEXT_PUBLIC_APP_URL environment variable is not set");
 
+    // Validate and apply promo code server-side
+    let discountAmount = 0;
+    let validatedPromoCode: string | null = null;
+
+    if (data.promoCode) {
+      const code = data.promoCode.toUpperCase().trim();
+      const promo = await prisma.promoCode.findUnique({ where: { code } });
+
+      const isValid =
+        promo &&
+        promo.active &&
+        (!promo.expiresAt || new Date() <= promo.expiresAt) &&
+        (promo.maxUses === null || promo.usedCount < promo.maxUses);
+
+      if (isValid && promo) {
+        if (promo.discountType === "PERCENTAGE") {
+          discountAmount = Math.round((data.price * promo.discountValue) / 100 * 100) / 100;
+        } else {
+          discountAmount = Math.min(promo.discountValue, data.price);
+        }
+        validatedPromoCode = promo.code;
+      }
+    }
+
+    const finalPrice = Math.max(0, data.price - discountAmount);
+
     // Create booking in PENDING — confirmed to BOOKED only after Stripe webhook fires
     const booking = await prisma.booking.create({
       data: {
         serviceType: data.serviceType,
         addOns: data.addOns,
-        price: data.price,
+        price: finalPrice,
         durationMinutes: data.durationMinutes,
         address: data.address,
         scheduleDate: new Date(data.scheduleDate + "T12:00:00"),
@@ -41,8 +68,18 @@ export async function POST(req: NextRequest) {
         status: "PENDING",
         guestEmail: data.email,
         guestPhone: data.phone ?? null,
+        promoCode: validatedPromoCode,
+        discountAmount,
       },
     });
+
+    // Increment promo code usage count
+    if (validatedPromoCode) {
+      await prisma.promoCode.update({
+        where: { code: validatedPromoCode },
+        data: { usedCount: { increment: 1 } },
+      });
+    }
 
     const serviceLabel =
       data.serviceType === "ONE_BEDROOM" ? "1 Bedroom Cleaning" : "2 Bedroom Cleaning";
@@ -52,7 +89,7 @@ export async function POST(req: NextRequest) {
         price_data: {
           currency: "usd",
           product_data: { name: serviceLabel },
-          unit_amount: Math.round(data.price * 100),
+          unit_amount: Math.round(finalPrice * 100),
         },
         quantity: 1,
       },
@@ -75,7 +112,7 @@ export async function POST(req: NextRequest) {
       data: {
         bookingId: booking.id,
         stripeSessionId: session.id,
-        amount: data.price,
+        amount: finalPrice,
         status: "PENDING",
       },
     });
