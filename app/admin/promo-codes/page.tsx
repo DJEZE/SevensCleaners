@@ -8,5 +8,11 @@ export default async function AdminPromoCodesPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  return <PromoCodesClient initialCodes={codes} />;
+  const serialized = codes.map((c) => ({
+    ...c,
+    expiresAt: c.expiresAt ? c.expiresAt.toISOString() : null,
+    createdAt: c.createdAt.toISOString(),
+  }));
+
+  return <PromoCodesClient initialCodes={serialized} />;
 }
