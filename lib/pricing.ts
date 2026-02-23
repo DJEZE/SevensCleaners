@@ -1,7 +1,7 @@
 export const PRICING = {
   services: {
     ONE_BEDROOM: { label: "1 Bedroom", price: 120, durationMinutes: 90 },
-    TWO_BEDROOM: { label: "2 Bedroom", price: 160, durationMinutes: 120 },
+    TWO_BEDROOM: { label: "2 Bedroom", price: 175, durationMinutes: 120 },
   },
   addOns: {
     DEEP_CLEAN:       { label: "Deep Clean",        price: 50, durationMinutes: 45 },
