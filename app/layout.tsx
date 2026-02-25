@@ -9,9 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Sevens Cleaners - On-Demand Apartment Cleaning",
+  title: "Sevens Cleaners - Residential Cleaning On Demand",
   description:
-    "Professional apartment cleaning on demand. Book online in minutes, pay securely, and get your space spotless.",
+    "Professional residential cleaning for houses and apartments. Book online in minutes, pay securely, and get your space spotless.",
 };
 
 export default function RootLayout({
