@@ -17,7 +17,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm text-slate-500">
-              Professional apartment cleaning on demand.
+              Professional residential cleaning for houses & apartments.
             </p>
           </div>
           <div>

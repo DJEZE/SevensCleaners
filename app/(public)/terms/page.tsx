@@ -10,7 +10,7 @@ export default function TermsPage() {
         </section>
         <section>
           <h2 className="text-xl font-bold text-slate-900">2. Services</h2>
-          <p>Sevens Cleaners provides on-demand apartment cleaning services. We reserve the right to refuse service to anyone at any time.</p>
+          <p>Sevens Cleaners provides on-demand residential cleaning services for houses and apartments. We reserve the right to refuse service to anyone at any time.</p>
         </section>
         <section>
           <h2 className="text-xl font-bold text-slate-900">3. Booking and Payment</h2>

@@ -266,7 +266,7 @@ export default function HomePage() {
             Simple, Flat-Rate Pricing
           </h2>
           <p className="text-slate-500 text-lg mb-8">
-            No hourly billing. No hidden fees. Pay a flat rate based on your apartment size — you'll always know the total before you book.
+            No hourly billing. No hidden fees. Pay a flat rate based on your home size — you'll always know the total before you book.
           </p>
           <div className="card p-8 inline-block text-left w-full max-w-sm mx-auto mb-8">
             <div className="text-sm font-semibold text-brand-600 uppercase tracking-wide mb-4">Standard Clean</div>
