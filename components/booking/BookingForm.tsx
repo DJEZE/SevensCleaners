@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { PRICING, ServiceType, AddOnType, calculateTotal } from "@/lib/pricing";
+import AddressAutocomplete from "./AddressAutocomplete";
 
 interface BookingFormState {
   step: number;
@@ -268,13 +269,11 @@ export default function BookingForm() {
 
           <div>
             <label className="label">Service Address *</label>
-            <input
-              type="text"
+            <AddressAutocomplete
               value={state.address}
-              onChange={(e) => { setState((p) => ({ ...p, address: e.target.value })); setAddressError(""); }}
-              placeholder="Enter your full address"
+              onChange={(v) => setState((p) => ({ ...p, address: v }))}
+              onClearError={() => setAddressError("")}
               className={`input ${addressError ? "border-red-400" : ""}`}
-              id="address-autocomplete"
             />
             {addressError && (
               <p className="text-red-600 text-sm mt-1">{addressError}</p>
