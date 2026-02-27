@@ -31,6 +31,10 @@ const faqs = [
     q: "Is my payment information secure?",
     a: "Yes. Payments are processed by Square — a PCI-compliant payment processor. We never store your card details.",
   },
+  {
+    q: "How do I contact support?",
+    a: "You can reach our support team by email at Support@Sevenscleaners.com. We're happy to help with any questions or concerns.",
+  },
 ];
 
 export default function FAQPage() {
@@ -45,6 +49,13 @@ export default function FAQPage() {
             <p className="text-slate-600 text-sm">{faq.a}</p>
           </div>
         ))}
+      </div>
+      <div className="mt-12 text-center">
+        <p className="text-slate-600 text-sm">Still have questions? Email us at{" "}
+          <a href="mailto:Support@Sevenscleaners.com" className="text-blue-600 hover:underline">
+            Support@Sevenscleaners.com
+          </a>
+        </p>
       </div>
     </div>
   );
