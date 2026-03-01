@@ -39,7 +39,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
       scheduleWindow: booking.scheduleWindow,
       price: booking.price,
       serviceType: booking.serviceType,
-      addOns: booking.addOns,
+      addOns: (booking.addOns as string[]) ?? [],
       customerPhone: booking.guestPhone ?? undefined,
       customerEmail: booking.guestEmail ?? undefined,
     });
