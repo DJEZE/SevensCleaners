@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { StatusTimeline } from "@/components/ui/StatusTimeline";
+import { sendBookingConfirmation } from "@/lib/notifications";
 
 interface Props {
   searchParams: { bookingId?: string };
@@ -22,8 +23,27 @@ export default async function ConfirmationPage({ searchParams }: Props) {
 
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
-    include: { payment: true },
+    include: {
+      payment: true,
+      messageLogs: { where: { type: "EMAIL" } },
+    },
   });
+
+  // If payment is confirmed but no confirmation email was sent yet (e.g. webhook missed),
+  // send it now so the customer always receives their confirmation.
+  if (booking && booking.status !== "PENDING" && booking.messageLogs.length === 0) {
+    await sendBookingConfirmation({
+      id: booking.id,
+      address: booking.address,
+      scheduleDate: booking.scheduleDate,
+      scheduleWindow: booking.scheduleWindow,
+      price: booking.price,
+      serviceType: booking.serviceType,
+      addOns: booking.addOns,
+      customerPhone: booking.guestPhone ?? undefined,
+      customerEmail: booking.guestEmail ?? undefined,
+    });
+  }
 
   if (!booking) {
     return (

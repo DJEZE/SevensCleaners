@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import Stripe from "stripe";
 import { z } from "zod";
+import { calculateProcessingFee } from "@/lib/pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -52,7 +53,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const finalPrice = Math.max(0, data.price - discountAmount);
+    const discountedPrice = Math.max(0, data.price - discountAmount);
+    const processingFee = discountedPrice > 0 ? calculateProcessingFee(discountedPrice) : 0;
+    const finalPrice = discountedPrice + processingFee;
 
     // Create booking in PENDING — confirmed to BOOKED only after Stripe webhook fires
     const booking = await prisma.booking.create({

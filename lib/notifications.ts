@@ -1,6 +1,7 @@
 import { sendSMS } from "./twilio";
 import { sendEmail } from "./sendgrid";
 import { prisma } from "./prisma";
+import { PRICING, AddOnType } from "./pricing";
 
 export async function sendBookingConfirmation(booking: {
   id: string;
@@ -9,7 +10,7 @@ export async function sendBookingConfirmation(booking: {
   scheduleWindow: string;
   price: number;
   serviceType: string;
-  addOns: unknown;
+  addOns: string[];
   customerPhone?: string;
   customerEmail?: string;
   customerName?: string;
@@ -48,7 +49,7 @@ export async function sendBookingConfirmation(booking: {
     });
   }
 
-  // Email
+  // Email to customer
   if (booking.customerEmail) {
     const emailResult = await sendEmail(
       booking.customerEmail,
@@ -66,6 +67,28 @@ export async function sendBookingConfirmation(booking: {
         externalId: emailResult.emailId,
       },
     });
+  }
+
+  // Internal copy to admin
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (adminEmail) {
+    const adminHtml = `
+      <h2>New Booking Received</h2>
+      <table style="border-collapse:collapse;width:100%">
+        <tr><td style="padding:8px;font-weight:bold">Booking ID</td><td style="padding:8px">${booking.id.slice(0,8).toUpperCase()}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold">Date</td><td style="padding:8px">${dateStr}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold">Time Window</td><td style="padding:8px">${booking.scheduleWindow}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold">Address</td><td style="padding:8px">${booking.address}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold">Service</td><td style="padding:8px">${booking.serviceType.replace("_", " ")}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold">Add-Ons</td><td style="padding:8px">${booking.addOns.length > 0 ? booking.addOns.map((a) => PRICING.addOns[a as AddOnType]?.label ?? a).join(", ") : "None"}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold">Total Paid</td><td style="padding:8px">$${booking.price}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold">Customer Email</td><td style="padding:8px">${booking.customerEmail || "N/A"}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold">Customer Phone</td><td style="padding:8px">${booking.customerPhone || "N/A"}</td></tr>
+      </table>
+    `;
+    const addOnLabels = booking.addOns.length > 0 ? booking.addOns.map((a) => PRICING.addOns[a as AddOnType]?.label ?? a).join(", ") : "None";
+    const adminText = `New Booking: ${booking.id.slice(0,8).toUpperCase()} | ${dateStr} ${booking.scheduleWindow} | ${booking.address} | ${booking.serviceType.replace("_", " ")} | Add-ons: ${addOnLabels} | $${booking.price} | ${booking.customerEmail || ""} | ${booking.customerPhone || ""}`;
+    await sendEmail(adminEmail, `New Booking: ${booking.id.slice(0,8).toUpperCase()}`, adminHtml, adminText);
   }
 }
 

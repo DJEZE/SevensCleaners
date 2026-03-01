@@ -47,6 +47,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
+    // Idempotency guard — if already processed, skip to avoid duplicate emails
+    if (paymentRecord.status === "COMPLETED") {
+      return NextResponse.json({ received: true });
+    }
+
     // Mark payment complete and store payment intent ID
     await prisma.payment.update({
       where: { id: paymentRecord.id },
@@ -73,7 +78,7 @@ export async function POST(req: NextRequest) {
       scheduleWindow: booking.scheduleWindow,
       price: booking.price,
       serviceType: booking.serviceType,
-      addOns: booking.addOns,
+      addOns: (booking.addOns as string[]) ?? [],
       customerPhone: booking.guestPhone ?? undefined,
       customerEmail,
     });
