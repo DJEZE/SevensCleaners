@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PRICING, ServiceType, AddOnType, calculateTotal } from "@/lib/pricing";
+import { PRICING, ServiceType, AddOnType, calculateTotal, calculateProcessingFee } from "@/lib/pricing";
 
 interface BookingFormState {
   step: number;
@@ -63,7 +63,9 @@ export default function BookingForm() {
 
   const subtotal = pricing?.price ?? 0;
   const discountAmount = promoResult?.valid ? (promoResult.discountAmount ?? 0) : 0;
-  const finalPrice = Math.max(0, subtotal - discountAmount);
+  const discountedPrice = Math.max(0, subtotal - discountAmount);
+  const processingFee = discountedPrice > 0 ? calculateProcessingFee(discountedPrice) : 0;
+  const finalPrice = discountedPrice + processingFee;
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -372,19 +374,21 @@ export default function BookingForm() {
               </div>
             )}
             <div className="border-t border-slate-200 pt-3 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-500">Subtotal</span>
+                <span className="text-slate-500">${subtotal.toFixed(2)}</span>
+              </div>
               {discountAmount > 0 && (
-                <>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">Subtotal</span>
-                    <span className="text-slate-500">${subtotal}</span>
-                  </div>
-                  <div className="flex justify-between text-sm text-green-600">
-                    <span>Promo ({promoResult?.code})</span>
-                    <span>-${discountAmount.toFixed(2)}</span>
-                  </div>
-                </>
+                <div className="flex justify-between text-sm text-green-600">
+                  <span>Promo ({promoResult?.code})</span>
+                  <span>-${discountAmount.toFixed(2)}</span>
+                </div>
               )}
-              <div className="flex justify-between">
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-500">Processing fee (2.9% + $0.30)</span>
+                <span className="text-slate-500">${processingFee.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between border-t border-slate-200 pt-2">
                 <span className="font-bold text-slate-900">Total</span>
                 <span className="text-xl font-bold text-brand-600">${finalPrice.toFixed(2)}</span>
               </div>

@@ -1,3 +1,11 @@
+export const PROCESSING_FEE_PERCENT = 0.029; // Stripe: 2.9%
+export const PROCESSING_FEE_FIXED = 0.30;   // Stripe: $0.30
+
+/** Returns the processing fee to add on top of a given amount. */
+export function calculateProcessingFee(amount: number): number {
+  return Math.round((amount * PROCESSING_FEE_PERCENT + PROCESSING_FEE_FIXED) * 100) / 100;
+}
+
 export const PRICING = {
   services: {
     ONE_BEDROOM: { label: "1 Bedroom", price: 120, durationMinutes: 90 },
