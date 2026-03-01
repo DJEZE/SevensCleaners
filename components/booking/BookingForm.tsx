@@ -225,18 +225,27 @@ export default function BookingForm() {
             <div className="grid grid-cols-2 gap-3">
               {ADD_ON_KEYS.map((key) => {
                 const addOn = PRICING.addOns[key];
+                const selected = state.addOns.includes(key);
                 return (
                   <button
                     key={key}
                     onClick={() => toggleAddOn(key)}
                     className={`p-4 rounded-lg border-2 text-left transition-all ${
-                      state.addOns.includes(key)
+                      selected
                         ? "border-brand-600 bg-brand-50"
                         : "border-slate-200 hover:border-brand-300"
                     }`}
                   >
-                    <div className="font-medium text-sm text-slate-900">{addOn.label}</div>
-                    <div className="text-brand-600 font-semibold text-sm">+${addOn.price}</div>
+                    <div className="flex items-start justify-between gap-1 mb-1">
+                      <div className="font-semibold text-sm text-slate-900">{addOn.label}</div>
+                      {selected && (
+                        <svg className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="text-xs text-slate-500 leading-snug mb-2">{addOn.description}</div>
+                    <div className="text-brand-600 font-bold text-sm">+${addOn.price}</div>
                   </button>
                 );
               })}
