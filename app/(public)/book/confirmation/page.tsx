@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { getStripe } from "@/lib/stripe";
 import { StatusTimeline } from "@/components/ui/StatusTimeline";
 import { sendBookingConfirmation } from "@/lib/notifications";
 
@@ -21,7 +22,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
     );
   }
 
-  const booking = await prisma.booking.findUnique({
+  let booking = await prisma.booking.findUnique({
     where: { id: bookingId },
     include: {
       payment: true,
@@ -29,8 +30,50 @@ export default async function ConfirmationPage({ searchParams }: Props) {
     },
   });
 
-  // If payment is confirmed but no confirmation email was sent yet (e.g. webhook missed),
-  // send it now so the customer always receives their confirmation.
+  // ── Stripe fallback ───────────────────────────────────────────────────────
+  // If the booking is still PENDING, the webhook may not have fired yet.
+  // Check Stripe directly and process the payment right here so it lands in
+  // Supabase automatically without any manual intervention.
+  if (booking?.status === "PENDING" && booking.payment?.stripeSessionId) {
+    try {
+      const session = await getStripe().checkout.sessions.retrieve(
+        booking.payment.stripeSessionId
+      );
+
+      if (session.payment_status === "paid") {
+        const paymentIntentId =
+          typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : session.payment_intent?.id ?? null;
+
+        await prisma.payment.update({
+          where: { bookingId: booking.id },
+          data: {
+            status: "COMPLETED",
+            ...(paymentIntentId ? { stripePaymentIntentId: paymentIntentId } : {}),
+          },
+        });
+
+        await prisma.booking.update({
+          where: { id: booking.id },
+          data: { status: "BOOKED" },
+        });
+
+        // Re-fetch so the page renders the confirmed state
+        booking = await prisma.booking.findUnique({
+          where: { id: bookingId },
+          include: {
+            payment: true,
+            messageLogs: { where: { type: "EMAIL" } },
+          },
+        });
+      }
+    } catch (err) {
+      console.error("Stripe session check failed:", err);
+    }
+  }
+
+  // Send confirmation email/SMS if it hasn't been sent yet
   if (booking && booking.status !== "PENDING" && booking.messageLogs.length === 0) {
     await sendBookingConfirmation({
       id: booking.id,

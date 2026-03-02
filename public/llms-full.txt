@@ -1,0 +1,122 @@
+# Sevens Cleaners — Full Reference
+
+> Professional, on-demand residential cleaning service serving the Greater Houston area. Book online, pay securely via Stripe, get real-time SMS and email updates.
+
+## About
+
+Sevens Cleaners makes it simple to get your home professionally cleaned without making a single phone call. Customers pick a service, choose their date and time window, pay, and get instant confirmation. All cleaners are vetted with government ID verification and background checks. Every service is fully insured.
+
+**Contact:** Support@Sevenscleaners.com
+**Service Area:** Greater Houston, Texas, USA
+**Website:** https://sevenscleaners.com
+
+---
+
+## Pricing
+
+### Standard Cleaning Services
+
+| Service | Price | Est. Duration |
+|---|---|---|
+| 1 Bedroom | $120 | ~90 minutes |
+| 2 Bedroom | $175 | ~120 minutes |
+
+### Optional Add-Ons
+
+| Add-On | Price | Est. Added Time | Description |
+|---|---|---|---|
+| Deep Clean | +$50 | +45 min | Baseboards, inside cabinets, window sills & all the spots a regular clean skips |
+| Extra Bedroom | +$40 | +30 min | Add a third or more bedroom for a full, thorough clean |
+| Inside Oven | +$25 | +20 min | Degrease and scrub burnt residue so your oven looks and smells brand new |
+| Inside Fridge | +$25 | +20 min | Wipe shelves, drawers & walls — fresh, odor-free, and ready to stock |
+| Move In / Move Out | +$75 | +60 min | Top-to-bottom deep clean to reclaim your deposit or start fresh |
+| Pet Hair | +$30 | +20 min | Specialized tools to lift stubborn pet hair and dander from floors and furniture |
+
+A small Stripe processing fee (2.9% + $0.30) is added at checkout. Promo codes are accepted.
+
+---
+
+## What Every Standard Clean Includes
+
+- Kitchen: counters, sink, stovetop & appliances wiped down
+- Bathrooms: toilet, tub/shower, vanity & mirrors scrubbed
+- All rooms: dusting, vacuuming & mopping
+- Trash emptied & bins wiped
+- Beds made (linens changed with Deep Clean add-on)
+- Interior windows and sliding doors cleaned
+
+---
+
+## How to Book
+
+1. Visit /book on the website
+2. Select a service type (1 Bedroom or 2 Bedroom)
+3. Optionally select add-ons
+4. Enter your service address (validated against service area)
+5. Pick a preferred date (next day minimum) and time window:
+   - 8:00 AM – 10:00 AM
+   - 10:00 AM – 12:00 PM
+   - 12:00 PM – 2:00 PM
+   - 2:00 PM – 4:00 PM
+   - 4:00 PM – 6:00 PM
+6. Enter contact email (required) and phone (optional, for SMS updates)
+7. Apply a promo code if available
+8. Pay securely via Stripe Checkout
+9. Receive instant booking confirmation by email and SMS
+
+No account required. Booking takes under 3 minutes.
+
+---
+
+## Frequently Asked Questions
+
+**How do I book a cleaning?**
+Select your service type, choose any add-ons, enter your address, pick a date and time window, then pay securely online. You'll get a confirmation by SMS and email.
+
+**How much does it cost?**
+1 bedroom starts at $120 and 2 bedroom starts at $175. Add-ons are available at additional cost. All prices are shown before checkout — no surprises.
+
+**Are your cleaners vetted?**
+Yes. All cleaners provide a government-issued photo ID which is verified and securely stored. We only activate cleaners approved by our admin team.
+
+**What areas do you serve?**
+We currently serve the Greater Houston, Texas area. Enter your address during booking — if we don't serve your area, you'll be notified before paying.
+
+**What if I need to reschedule?**
+Contact support as soon as possible at Support@Sevenscleaners.com. Cancellations within 24 hours of the scheduled time may incur a fee.
+
+**Do cleaners bring their own supplies?**
+Some cleaners include supplies; this is noted during the booking assignment. You can add a note if you have specific product preferences.
+
+**How will I know when my cleaner is on the way?**
+You'll receive SMS and email notifications when a cleaner is assigned and again when they are in route and when the job is complete.
+
+**Is my payment information secure?**
+Yes. Payments are processed by Stripe — a PCI-compliant payment processor. Card details are never stored by Sevens Cleaners.
+
+**What is the satisfaction guarantee?**
+If you're not happy with anything, let us know within 24 hours and we'll return to make it right at no extra cost.
+
+**How do I contact support?**
+Email Support@Sevenscleaners.com.
+
+---
+
+## Trust & Credibility
+
+- 500+ cleanings completed
+- 4.9 average star rating
+- 100% background-checked cleaners
+- Fully insured services
+- Satisfaction guarantee — we come back for free if anything is missed
+
+---
+
+## Site Pages
+
+- [Home](/) — Hero, how it works, what's included, why Sevens, testimonials, pricing teaser
+- [Pricing](/pricing) — Full pricing table with services and add-ons
+- [Book a Cleaning](/book) — 3-step booking flow: service → schedule → pay
+- [FAQ](/faq) — Frequently asked questions
+- [Privacy Policy](/privacy) — How customer data is collected and used
+- [Terms of Service](/terms) — Terms of use

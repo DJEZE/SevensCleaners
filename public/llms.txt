@@ -1,0 +1,54 @@
+# Sevens Cleaners
+
+> Professional, on-demand residential cleaning service serving the Greater Houston area. Book online in minutes, pay securely, and get real-time updates from your cleaner.
+
+Sevens Cleaners is a residential cleaning company that lets customers book, pay, and track cleanings entirely online — no phone calls required. All cleaners are vetted, background-checked, and insured. Flat-rate pricing with no hidden fees. SMS and email updates keep customers informed from booking to completion.
+
+## Services
+
+- **1 Bedroom Clean** — $120, approx. 90 minutes. Full standard clean of a 1-bedroom home or apartment.
+- **2 Bedroom Clean** — $175, approx. 120 minutes. Full standard clean of a 2-bedroom home or apartment.
+
+Every standard clean includes: kitchen counters, sink, stovetop & appliances; bathrooms (toilet, tub/shower, vanity, mirrors); all rooms dusted, vacuumed & mopped; trash emptied; beds made; interior windows cleaned.
+
+## Optional Add-Ons
+
+- **Deep Clean** — +$50, +45 min. Baseboards, inside cabinets, window sills, and all the spots a regular clean skips.
+- **Extra Bedroom** — +$40, +30 min. Add a third or more bedroom for a full, thorough clean throughout.
+- **Inside Oven** — +$25, +20 min. Degrease and scrub burnt residue so your oven looks and smells brand new.
+- **Inside Fridge** — +$25, +20 min. Wipe shelves, drawers, and walls — fresh, odor-free, and ready to stock.
+- **Move In / Move Out** — +$75, +60 min. Top-to-bottom deep clean to get your deposit back or start fresh in a new place.
+- **Pet Hair** — +$30, +20 min. Specialized tools to lift stubborn pet hair and dander from floors and furniture.
+
+## How to Book
+
+1. Go to the booking page at /book
+2. Select a service (1 Bedroom or 2 Bedroom)
+3. Choose any add-ons
+4. Enter your address and preferred date/time window
+5. Pay securely via Stripe
+6. Receive SMS and email confirmation immediately
+
+Booking takes under 3 minutes. No account required.
+
+## Why Sevens Cleaners
+
+- Fully vetted, background-checked cleaners
+- Flat-rate pricing — no hourly surprises
+- Real-time SMS and email updates (on the way, arrived, done)
+- Satisfaction guaranteed — we return within 24 hours if anything is missed
+- Fully insured
+- Promo codes accepted at checkout
+
+## Service Area
+
+Greater Houston, Texas, USA.
+
+## Pages
+
+- [Home](/) — Overview, how it works, testimonials
+- [Pricing](/pricing) — Full pricing breakdown with add-ons
+- [Book a Cleaning](/book) — Start a booking
+- [FAQ](/faq) — Frequently asked questions
+- [Privacy Policy](/privacy) — Data and privacy information
+- [Terms of Service](/terms) — Terms of use
